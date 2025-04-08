@@ -77,4 +77,10 @@ func contarVotos(listaVotos []int) {
 	for k, v := range mapa {
 		fmt.Printf("Opción %d: %d votos\n", k, v)
 	}
+
+	if mapa[1]+mapa[2] > mapa[5]+mapa[4] {
+		fmt.Println("Resultado mejorable!")
+	} else {
+		fmt.Println("¡Buen Resultado!")
+	}
 }
