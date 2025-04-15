@@ -1,86 +1,143 @@
 package main
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+
+	"github.com/fatih/color"
+)
+
+//"errors"
+//"go_parte_2/matematica"
+//"strings"
 
 func main() {
-	var cont int
-	for {
-		fmt.Println("Cuantas encuestas se realizaran? ")
-		fmt.Scanln(&cont)
+	var listDispositivos []Dispositivo
+	listDispositivos = append(listDispositivos, Dispositivo{Nombre: "Lampara", Estado: false})
+	listDispositivos = append(listDispositivos, Dispositivo{Nombre: "Radio", Estado: true})
+	listDispositivos = append(listDispositivos, Dispositivo{Nombre: "Televisor", Estado: false})
+	listDispositivos = append(listDispositivos, Dispositivo{Nombre: "Cocina", Estado: true})
+	listDispositivos = append(listDispositivos, Dispositivo{Nombre: "Telefono", Estado: false})
 
-		if cont > 0 {
-			break
+	for i := 0; i < len(listDispositivos); i++ {
+		fmt.Print("Estado Actual: ")
+		listDispositivos[i].getEstado()
+		if i/2 == 0 {
+			err := listDispositivos[i].Encender()
+			if err != nil {
+				fmt.Println("Error: ", err.Error())
+			}
 		} else {
-			fmt.Println("Ingrese un valor valido")
-			var basura string
-			fmt.Scanln(&basura)
-			continue
+			err := listDispositivos[i].Apagar()
+			if err != nil {
+				fmt.Println("Error: ", err.Error())
+			}
 		}
+		fmt.Print("Nuevo estado: ")
+		listDispositivos[i].getEstado()
 	}
-
-	var firstTen []int
-	var allVotos []int
-	for i := 0; i < cont; i++ {
-		puntaje := encuesta()
-		if i < 10 {
-			firstTen = append(firstTen, puntaje)
-		}
-		allVotos = append(allVotos, puntaje)
-	}
-
-	fmt.Println("Total primeros 10: ")
-	contarVotos(firstTen)
-	fmt.Println("Total de todos los votos:")
-	contarVotos(allVotos)
 }
 
-func encuesta() int {
-	var puntaje int
-	for {
-		fmt.Println("Indique un puntaje entre 1-5: ")
-		fmt.Scanln(&puntaje)
-		if puntaje > 0 && puntaje <= 5 {
-			break
-		} else {
-			fmt.Println("Ingrese un valor valido")
-			var basura string
-			fmt.Scanln(&basura)
-			continue
-		}
-	}
-	return puntaje
+type Dispositivo struct {
+	Nombre string
+	Estado bool
 }
 
-func contarVotos(listaVotos []int) {
-	mapa := make(map[int]int)
-	mapa[1] = 0
-	mapa[2] = 0
-	mapa[3] = 0
-	mapa[4] = 0
-	mapa[5] = 0
-
-	for _, v := range listaVotos {
-		switch v {
-		case 1:
-			mapa[1]++
-		case 2:
-			mapa[2]++
-		case 3:
-			mapa[3]++
-		case 4:
-			mapa[4]++
-		case 5:
-			mapa[5]++
-		}
+func (d Dispositivo) getEstado() {
+	if d.Estado {
+		color.Green(d.EstadoActual())
 	}
-
-	for k, v := range mapa {
-		fmt.Printf("Opción %d: %d votos\n", k, v)
-	}
-
-	if mapa[1]+mapa[2] > mapa[5]+mapa[4] {
-		fmt.Println("Resultado mejorable!")
-	} else {
-		fmt.Println("¡Buen Resultado!")
-	}
+	color.Red(d.EstadoActual())
 }
+
+func (d Dispositivo) EstadoActual() string {
+	if d.Estado {
+		return "Encendido"
+	}
+	return "Apagado"
+}
+
+func (d *Dispositivo) Encender() error {
+	if d.Estado {
+		return errors.New("el dispositivo ya esta encendido")
+	}
+	d.Estado = true
+	return nil
+}
+
+func (d *Dispositivo) Apagar() error {
+	if !d.Estado {
+		return errors.New("el dispositivo ya esta apagado")
+	}
+	d.Estado = false
+	return nil
+}
+
+type Controlabe interface {
+	Encender() error
+	Apagar() error
+	EstadoActual() string
+}
+
+/*
+
+func main() {
+
+	litString := "Hola"
+	//var puntString = &litString
+
+	modString(&litString)
+	fmt.Println(litString)
+
+	err := checkStr("")
+	if err != nil {
+		fmt.Println("Error", err)
+	}
+	//fmt.Println(litString, puntString, *puntString)
+
+	persona := Persona{
+		Nombre:   "Leandro",
+		Apellido: "Aguero",
+		Edad:     20,
+	}
+	var presentable Presentable
+	presentable = &persona
+	presentable.Presentarse()
+	fmt.Println(persona)
+
+}
+
+type Persona struct {
+	Nombre   string //publico
+	Apellido string
+	Edad     int
+}
+
+func (p *Persona) Presentarse() string {
+	return p.Nombre + " " + p.Apellido
+}
+
+type Presentable interface {
+	Presentarse() string
+}
+
+func (p Persona) getNombre() string {
+	return (p.Nombre)
+}
+
+func (p *Persona) setNombre(nombre string) {
+	p.Nombre = nombre
+}
+
+func modString(s *string) {
+	*s = "Algo"
+}
+
+func checkStr(s string) error {
+	if s == "" {
+		return errors.New("string vacio")
+	}
+	return nil
+}
+
+*/
